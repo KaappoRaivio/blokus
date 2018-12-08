@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Piece {
-    public static int BLUE = 1;
-    public static int RED = 2;
-    public static int GREEN = 3;
-    public static int YELLOW = 4;
+    public static final int BLUE = 1;
+    public static final int RED = 2;
+    public static final int GREEN = 3;
+    public static final int YELLOW = 4;
 
     public static String PIECE_1 = "pieces/piece1.txt";
     public static String PIECE_2 = "pieces/piece2.txt";
@@ -40,10 +40,14 @@ public class Piece {
     public static String PIECE_21 = "pieces/piece21.txt";
 
 
+    public char[][] getMesh() {
+        return mesh;
+    }
+
     private char[][] mesh = new char[5][5];
     private int color;
 
-    public Piece(String filename, int color) {
+    Piece (String filename, int color) {
         this.color = color;
 
 
@@ -56,6 +60,61 @@ public class Piece {
             }
         }
 
+    }
+
+    private Piece (char[][] mesh, int color) {
+        this.color = color;
+        this.mesh = mesh;
+    }
+
+    Piece rotate(int orietation, boolean flip) {
+        char[][] newlist = new char[5][5];
+
+        switch (orietation) {
+            case Orientation.UP:
+                newlist = this.mesh;
+            case Orientation.DOWN:
+                for (int y = 0; y < this.mesh.length; y++) {
+                    for (int x = 0; x < this.mesh[y].length; x++) {
+                        newlist[4 - y][4 - x] = this.mesh[y][x];
+                    }
+                }
+                break;
+            case Orientation.RIGHT:
+                for (int y = 0; y < this.mesh.length; y++) {
+                    for (int x = 0; x < this.mesh[y].length; x++) {
+                        newlist[4 - x][y] = this.mesh[y][x];
+                    }
+                }
+                break;
+            case Orientation.LEFT:
+                for (int y = 0; y < this.mesh.length; y++) {
+                    for (int x = 0; x < this.mesh[y].length; x++) {
+                        newlist[x][4 - y] = this.mesh[y][x];
+                    }
+                }
+                break;
+        }
+
+        char[][] afterFlip = new char[5][5];
+
+        if (flip) {
+            for (int y = 0; y < this.mesh.length; y++) {
+                for (int x = 0; x < this.mesh[y].length; x++) {
+                    afterFlip[y][4 - x] = newlist[y][x];
+                }
+            }
+        } else {
+            afterFlip = newlist;
+        }
+
+
+        return new Piece(afterFlip, this.color);
+
+    }
+
+    public int getColor() {
+        return this.color;
     }
 
     public String toString () {
