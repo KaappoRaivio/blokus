@@ -1,5 +1,5 @@
-
 import com.google.common.base.Charsets;
+
 import com.google.common.io.Resources;
 
 import java.io.*;
@@ -48,8 +48,27 @@ public class Piece {
     private char[][] mesh = new char[5][5];
     private int color;
 
+    private static boolean isValid (int color) {
+        switch (color) {
+            case BLUE:
+                return true;
+            case RED:
+                return true;
+            case GREEN:
+                return true;
+            case YELLOW:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     Piece (String filename, int color) {
-        this.color = color;
+        if (isValid(color)) {
+            this.color = color;
+        } else {
+            throw new RuntimeException("Invalid color " + color + "!");
+        }
 
 
         String text = new Scanner(this.getClass().getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A").next();
@@ -68,7 +87,7 @@ public class Piece {
         this.mesh = mesh;
     }
 
-    Piece rotate(int orietation, boolean flip) {
+    Piece rotate (int orietation, boolean flip) {
         char[][] newlist = new char[5][5];
 
         switch (orietation) {
