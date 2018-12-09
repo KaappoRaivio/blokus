@@ -16,6 +16,7 @@ public class Piece {
     public static final int RED = 2;
     public static final int GREEN = 3;
     public static final int YELLOW = 4;
+    public static final int NO_PIECE = 0;
 
     public static String PIECE_1 = "pieces/piece1.txt";
     public static String PIECE_2 = "pieces/piece2.txt";

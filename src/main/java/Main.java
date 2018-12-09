@@ -6,7 +6,7 @@ public class Main {
 
         Piece piece = new Piece(Piece.PIECE_19, Piece.BLUE);
 
-        board.fits(5, 5, piece);
+        System.out.println(board.putOnBoard(5, 5, piece));
         System.out.println(board);
 
     }
