@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Board {
@@ -17,15 +16,12 @@ public class Board {
         board = new int[20][20];
         errorBoard = new int[20][20];
 
-        for (int i = 0; i < board.length ; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-//                board[i][j] = '░';
-                errorBoard[i][j] = Piece.NO_PIECE;
-                board[i][j] = Piece.NO_PIECE;
-
+        for (int y = 0; y < board.length ; y++) {
+            for (int x = 0; x < board[y].length; x++) {
+                errorBoard[y][x] = Piece.NO_PIECE;
+                board[y][x] = Piece.NO_PIECE;
             }
         }
-
     }
 
     private boolean isPieceOnBoard (Piece piece) {
@@ -46,8 +42,8 @@ public class Board {
 
     public boolean putOnBoard(int baseX, int baseY, Piece piece) {
         if (fits(baseX, baseY, piece)) {
-//        if (true) {
-            dummyPut(baseX, baseY, piece);
+            this.dummyPut(baseX, baseY, piece);
+            piece.placeOnBoard(baseX, baseY);
             return true;
         } else {
             errorPut(baseX, baseY, piece);
@@ -58,12 +54,10 @@ public class Board {
 
     private boolean fits (int baseX, int baseY, Piece piece) {
         char[][] mesh = piece.getMesh();
-        
 
         if (isPieceOnBoard(piece)) {
             return false;
         }
-
 
         boolean isConnected = false;
         boolean fits = true;
@@ -71,12 +65,14 @@ public class Board {
         for (int y = 0; y < mesh.length; y++) {
             for (int x = 0; x < mesh[y].length; x++) {
                 char current = mesh[y][x];
-                if (current == '.') {
+
+                if (current == Piece.TRANSPARENT) {
                     continue;
                 }
 
                 if (board[y][x] != Piece.NO_PIECE) {
-                    fits = false;
+                    fits =
+                            false;
                     break;
                 }
 
@@ -86,7 +82,6 @@ public class Board {
                         board[y + baseY - 1][x + baseX - 1] == piece.getColor() ||
                         board[y + baseY - 1][x + baseX + 1] == piece.getColor())
                     ) {
-                    System.out.println("Connected!");
                     isConnected = true;
                 }
 
@@ -99,10 +94,8 @@ public class Board {
                 }
             }
         }
-        System.out.println(isConnected + " " + fits + " " + !isColorOnBoard(piece.getColor()));
 
         if (fits && !isColorOnBoard(piece.getColor())) {
-            System.out.println("First piece of color " + piece.getColor());
             isConnected = true;
         }
 
@@ -158,13 +151,13 @@ public class Board {
                 char current = mesh[y][x];
 
                 switch (current) {
-                    case '#':
+                    case Piece.OPAQUE:
                         this.board[baseY + y][baseX + x] = piece.getColor();
                         break;
-                    case '.':
+                    case Piece.TRANSPARENT:
                         break;
                     default:
-                        throw new RuntimeException("Invalid piece " + piece.toString());
+                        throw new RuntimeException("Invalid piece " + piece.toString() + ", " + current);
                 }
 
             }
@@ -179,10 +172,10 @@ public class Board {
                 char current = mesh[y][x];
 
                 switch (current) {
-                    case '#':
+                    case Piece.OPAQUE:
                         errorBoard[baseY + y][baseX + x] = piece.getColor();
                         break;
-                    case '.':
+                    case Piece.TRANSPARENT:
                         break;
                     default:
                         throw new RuntimeException("Invalid piece " + piece.toString());
