@@ -1,7 +1,7 @@
 public class Main {
     public static void main (String[] args) {
-        Board board = Board.fromFile("/home/kaappo/git/blokus/src/main/resources/boards/Fri Dec 14 14:26:31 CET 2018.ser", false);
-
+//        Board board = Board.fromFile("/home/kaappo/git/blokus/src/main/resources/boards/Fri Dec 14 14:26:31 CET 2018.ser", false);
+        Board board = new Board();
 
         Piece piece19 = new Piece(Piece.PIECE_19, PieceType.BLUE);
         Piece piece18 = new Piece(Piece.PIECE_18, PieceType.BLUE).rotate(Orientation.DOWN, false);

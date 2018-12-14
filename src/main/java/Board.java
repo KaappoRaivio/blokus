@@ -57,6 +57,7 @@ public class Board implements java.io.Serializable {
     public boolean putOnBoard(int baseX, int baseY, Piece piece) {
         if (fits(baseX, baseY, piece)) {
             dummyPut(baseX, baseY, piece);
+            addToPiecesOnBoard(piece);
             piece.placeOnBoard(baseX, baseY);
             return true;
         } else {
@@ -119,7 +120,6 @@ public class Board implements java.io.Serializable {
 
 
         if (fits && isConnected) {
-            addToPiecesOnBoard(piece);
             return true;
         } else {
             return false;
@@ -338,12 +338,38 @@ public class Board implements java.io.Serializable {
         throw new RuntimeException(new NotImplementedError());
     }
 
+    private List<Piece> getPiecesNotOnBoard (PieceType color) {
+        switch (color) {
+            case BLUE:
+                return bluePiecesNotOnBoard;
+            case RED:
+                return redPiecesNotOnBoard;
+            case GREEN:
+                return greenPiecesNotOnBoard;
+            case YELLOW:
+                return yellowPiecesNotOnBoard;
+            default:
+                throw new RuntimeException("Invalid color " + color);
+        }
+    }
+
     public List<Move> getAllFittingMoves (PieceType color) {
+        List<Piece> pieces = getPiecesNotOnBoard(color);
+        List<Move> moves = new ArrayList<>();
+
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[y].length; x++) {
-                
+                for (Piece notRotated : pieces) {
+                    for (Piece piece : notRotated.getAllOrientations()) {
+                        if (fits(x, y, piece)) {
+                            moves.add(new Move(x, y, piece));
+                        }
+                    }
+                }
             }
         }
+
+        return moves;
     }
 
 
