@@ -1,38 +1,52 @@
+
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class Board {
+public class Board implements java.io.Serializable {
 
     private List<Piece> bluePiecesOnBoard = new ArrayList<>();
     private List<Piece> redPiecesOnBoard = new ArrayList<>();
     private List<Piece> greenPiecesOnBoard = new ArrayList<>();
     private List<Piece> yellowPiecesOnBoard = new ArrayList<>();
 
+    private List<Piece> bluePiecesNotOnBoard = Piece.getAllPieces(PieceType.BLUE);
+    private List<Piece> redPiecesNotOnBoard = Piece.getAllPieces(PieceType.RED);
+    private List<Piece> greenPiecesNotOnBoard = Piece.getAllPieces(PieceType.GREEN);
+    private List<Piece> yellowPiecesNotOnBoard = Piece.getAllPieces(PieceType.YELLOW);
 
-    private int[][] board;
-    private int[][] errorBoard;
 
-    Board() {
-        board = new int[20][20];
-        errorBoard = new int[20][20];
+    private PieceType[][] board;
+    private PieceType[][] errorBoard;
 
-        for (int y = 0; y < board.length ; y++) {
+    Board () {
+        board = new PieceType[20][20];
+        errorBoard = new PieceType[20][20];
+
+        initializeBoards();
+    }
+
+    private void initializeBoards () {
+        for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board[y].length; x++) {
-                errorBoard[y][x] = Piece.NO_PIECE;
-                board[y][x] = Piece.NO_PIECE;
+                errorBoard[y][x] = PieceType.NO_PIECE;
+                board[y][x] = PieceType.NO_PIECE;
             }
         }
     }
 
+
+
     private boolean isPieceOnBoard (Piece piece) {
         switch (piece.getColor()) {
-            case Piece.BLUE:
+            case BLUE:
                 return bluePiecesOnBoard.contains(piece);
-            case Piece.RED:
+            case RED:
                 return redPiecesOnBoard.contains(piece);
-            case Piece.YELLOW:
+            case YELLOW:
                 return yellowPiecesOnBoard.contains(piece);
-            case Piece.GREEN:
+            case GREEN:
                 return greenPiecesOnBoard.contains(piece);
             default:
                 throw new RuntimeException("Invalid color " + piece.getColor() + "!");
@@ -42,13 +56,17 @@ public class Board {
 
     public boolean putOnBoard(int baseX, int baseY, Piece piece) {
         if (fits(baseX, baseY, piece)) {
-            this.dummyPut(baseX, baseY, piece);
+            dummyPut(baseX, baseY, piece);
             piece.placeOnBoard(baseX, baseY);
             return true;
         } else {
             errorPut(baseX, baseY, piece);
             return false;
         }
+    }
+
+    public boolean putOnBoard (Move move) {
+        return putOnBoard(move.getX(), move.getY(), move.getPiece());
     }
 
 
@@ -70,7 +88,7 @@ public class Board {
                     continue;
                 }
 
-                if (board[y][x] != Piece.NO_PIECE) {
+                if (board[y][x] != PieceType.NO_PIECE) {
                     fits =
                             false;
                     break;
@@ -111,31 +129,35 @@ public class Board {
 
     private void addToPiecesOnBoard (Piece piece) {
         switch (piece.getColor()) {
-            case Piece.BLUE:
+            case BLUE:
                 bluePiecesOnBoard.add(piece);
+                bluePiecesNotOnBoard.remove(piece);
                 break;
-            case Piece.RED:
+            case RED:
                 redPiecesOnBoard.add(piece);
+                redPiecesNotOnBoard.remove(piece);
                 break;
-            case Piece.YELLOW:
+            case YELLOW:
                 yellowPiecesOnBoard.add(piece);
+                yellowPiecesNotOnBoard.remove(piece);
                 break;
-            case Piece.GREEN:
+            case GREEN:
                 greenPiecesOnBoard.add(piece);
+                greenPiecesNotOnBoard.remove(piece);
                 break;
 
         }
     }
 
-    private boolean isColorOnBoard (int color) {
+    private boolean isColorOnBoard (PieceType color) {
         switch (color) {
-            case Piece.BLUE:
+            case BLUE:
                 return !bluePiecesOnBoard.isEmpty();
-            case Piece.RED:
+            case RED:
                 return !redPiecesOnBoard.isEmpty();
-            case Piece.YELLOW:
+            case YELLOW:
                 return !yellowPiecesOnBoard.isEmpty();
-            case Piece.GREEN:
+            case GREEN:
                 return !greenPiecesOnBoard.isEmpty();
             default:
                 throw new RuntimeException("Invalid color " + color + "!");
@@ -186,25 +208,42 @@ public class Board {
     }
 
 
-    private static char getMatchingChar (int color) {
+    private static char getMatchingChar (PieceType color) {
         switch (color) {
-            case Piece.BLUE:
+            case BLUE:
                 return 'B';
-            case Piece.RED:
+            case RED:
                 return 'R';
-            case Piece.GREEN:
+            case GREEN:
                 return 'G';
-            case Piece.YELLOW:
+            case YELLOW:
                 return 'Y';
-            case Piece.NO_PIECE:
+            case NO_PIECE:
                 return '░';
             default:
                 throw new RuntimeException("Invalid color " + color + "!");
         }
     }
 
+    private static PieceType getPieceColorFromChar (char color) {
+        switch (color) {
+            case 'B':
+                return PieceType.BLUE;
+            case 'R':
+                return PieceType.RED;
+            case 'Y':
+                return PieceType.YELLOW;
+            case 'G':
+                return PieceType.GREEN;
+            case '░':
+                return PieceType.NO_PIECE;
+            default:
+                throw new RuntimeException("Invalid color " + color + "!");
+        }
+    }
 
-    public int[][] getBoard() {
+
+    public PieceType[][] getBoard() {
         return board;
     }
 
@@ -212,10 +251,10 @@ public class Board {
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < board.length; i++) {
-            int[] row = board[i];
+            PieceType[] row = board[i];
             builder.append("\n");
             for (int index = 0; index < row.length - 1; index++) {
-                if (errorBoard[i][index] != Piece.NO_PIECE) {
+                if (errorBoard[i][index] != PieceType.NO_PIECE) {
                     builder.append('E');
                 } else {
                     builder.append(getMatchingChar(row[index]));
@@ -223,7 +262,7 @@ public class Board {
                 builder.append(" ");
             }
 
-            if (errorBoard[i][row.length - 1] != Piece.NO_PIECE) {
+            if (errorBoard[i][row.length - 1] != PieceType.NO_PIECE) {
                 builder.append('E');
             } else {
                 builder.append(getMatchingChar(row[row.length - 1]));
@@ -233,4 +272,85 @@ public class Board {
 
         return builder.toString();
     }
+
+    public String save() {
+        String path = System.getProperty("user.dir") + "/src/main/resources/boards/" + new Date().toString() + ".ser";
+
+
+        File file = new File(path);
+        System.out.println(file.exists());
+
+        try {
+            if (file.createNewFile()) {
+                System.out.println("Creating new file " + path);
+
+            } else {
+                System.out.println("File " + path + " already exists");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        try {
+            FileOutputStream fileOut = new FileOutputStream(path);
+
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(this);
+            out.close();
+
+            fileOut.close();
+
+            System.out.println("Saved board to: " + path);
+      } catch (IOException e) {
+            throw new RuntimeException(e);
+      }
+
+      return path;
+    }
+
+    public static Board fromFile (String path, boolean relative) {
+        String absolutePath;
+
+        if (relative) {
+            absolutePath = System.getProperty("user.dir") + "/src/main/resources/boards/" + new Date().toString() + ".ser";
+        } else {
+            absolutePath = path;
+        }
+
+        Board board = null;
+        try {
+            FileInputStream fileIn = new FileInputStream(absolutePath);
+
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            board = (Board) in.readObject();
+            in.close();
+
+            fileIn.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return board;
+    }
+
+    public static Board fromHumanReadableFile (String filePath, boolean absolute) {
+        throw new RuntimeException(new NotImplementedError());
+    }
+
+    public List<Move> getAllFittingMoves (PieceType color) {
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board[y].length; x++) {
+                
+            }
+        }
+    }
+
+
+
+
+
 }
+
+
+class NotImplementedError extends Exception {}

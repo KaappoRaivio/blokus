@@ -11,13 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class Piece {
-    public static final int BLUE = 1;
-    public static final int RED = 2;
-    public static final int GREEN = 3;
-    public static final int YELLOW = 4;
-    public static final int NO_PIECE = 0;
-
+public class Piece implements java.io.Serializable {
     public static final String PIECE_1 = "pieces/piece1.txt";
     public static final String PIECE_2 = "pieces/piece2.txt";
     public static final String PIECE_3 = "pieces/piece3.txt";
@@ -44,8 +38,11 @@ public class Piece {
     public static final char TRANSPARENT = '.';
 
     private char[][] mesh = new char[5][5];
-    private int color;
+    private PieceType color;
+
     private int posX = -1;
+    private int posY = -1;
+    private boolean onBoard = false;
 
     public int getPosX() {
         return posX;
@@ -55,8 +52,6 @@ public class Piece {
         return posY;
     }
 
-    private int posY = -1;
-    private boolean onBoard = false;
 
     public void placeOnBoard (int posX, int posY) {
         if (onBoard) {
@@ -74,7 +69,7 @@ public class Piece {
     }
 
 
-    private static boolean isValid (int color) {
+    private static boolean isValid (PieceType color) {
         switch (color) {
             case BLUE:
                 return true;
@@ -97,7 +92,7 @@ public class Piece {
         }
     }
 
-    public Piece (String filename, int color) {
+    public Piece (String filename, PieceType color) {
         if (isValid(color)) {
             this.color = color;
         } else {
@@ -158,7 +153,7 @@ public class Piece {
         moveUp();
     }
 
-    private Piece (char[][] mesh, int color) {
+    private Piece (char[][] mesh, PieceType color) {
         this.color = color;
         this.mesh = mesh;
     }
@@ -225,7 +220,33 @@ public class Piece {
         );
     }
 
-    public int getColor() {
+    public static List<Piece> getAllPieces (PieceType color) {
+        return Arrays.asList(
+                new Piece(PIECE_1, color),
+                new Piece(PIECE_2, color),
+                new Piece(PIECE_3, color),
+                new Piece(PIECE_4, color),
+                new Piece(PIECE_5, color),
+                new Piece(PIECE_6, color),
+                new Piece(PIECE_7, color),
+                new Piece(PIECE_8, color),
+                new Piece(PIECE_9, color),
+                new Piece(PIECE_10, color),
+                new Piece(PIECE_11, color),
+                new Piece(PIECE_12, color),
+                new Piece(PIECE_13, color),
+                new Piece(PIECE_14, color),
+                new Piece(PIECE_15, color),
+                new Piece(PIECE_16, color),
+                new Piece(PIECE_17, color),
+                new Piece(PIECE_18, color),
+                new Piece(PIECE_19, color),
+                new Piece(PIECE_20, color),
+                new Piece(PIECE_21, color)
+        );
+    }
+
+    public PieceType getColor() {
         return this.color;
     }
 
