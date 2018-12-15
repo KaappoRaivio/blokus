@@ -16,7 +16,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="DarkyenusTimeTracker">
-    <option name="totalTimeSeconds" value="52542" />
+    <option name="totalTimeSeconds" value="56432" />
     <option name="gitIntegration" value="true" />
     <option name="naggedAbout" value="1" />
   </component>
@@ -75,10 +75,10 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="bat" value="2" />
-          <entry key="class" value="12" />
+          <entry key="class" value="13" />
           <entry key="gradle" value="5" />
           <entry key="gradlew" value="1" />
-          <entry key="java" value="19" />
+          <entry key="java" value="21" />
           <entry key="ser" value="1" />
           <entry key="txt" value="29" />
         </counts>
@@ -86,9 +86,9 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Bat" value="2" />
-          <entry key="CLASS" value="12" />
+          <entry key="CLASS" value="13" />
           <entry key="Groovy" value="5" />
-          <entry key="JAVA" value="19" />
+          <entry key="JAVA" value="21" />
           <entry key="PLAIN_TEXT" value="31" />
         </counts>
       </usages-collector>
@@ -96,7 +96,7 @@
         <counts>
           <entry key="class" value="4" />
           <entry key="gradle" value="47" />
-          <entry key="java" value="12820" />
+          <entry key="java" value="14163" />
           <entry key="txt" value="631" />
         </counts>
       </usages-collector>
@@ -104,7 +104,7 @@
         <counts>
           <entry key="CLASS" value="4" />
           <entry key="Groovy" value="47" />
-          <entry key="JAVA" value="12820" />
+          <entry key="JAVA" value="14163" />
           <entry key="PLAIN_TEXT" value="631" />
         </counts>
       </usages-collector>
@@ -115,10 +115,15 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/Board.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="418" column="31" lean-forward="true" selection-start-line="418" selection-start-column="31" selection-end-line="418" selection-end-column="31" />
+            <state relative-caret-position="209">
+              <caret line="408" column="90" selection-start-line="408" selection-start-column="90" selection-end-line="408" selection-end-column="90" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#Board#0;class#Board#0" />
+                <element signature="method#initializeBoards#0;class#Board#0" />
+                <element signature="method#isPieceOnBoard#0;class#Board#0" />
+                <element signature="method#putOnBoard#0;class#Board#0" />
+                <element signature="method#safeOffset#0;class#Board#0" />
                 <element signature="method#fits#0;class#Board#0" />
                 <element signature="method#addToPiecesOnBoard#0;class#Board#0" />
                 <element signature="method#isColorOnBoard#0;class#Board#0" />
@@ -127,11 +132,21 @@
                 <element signature="method#getMatchingChar#0;class#Board#0" />
                 <element signature="method#getPieceColorFromChar#0;class#Board#0" />
                 <element signature="method#toString#0;class#Board#0" />
-                <element signature="method#save#0;class#Board#0" />
-                <element signature="method#fromFile#0;class#Board#0" />
+                <element signature="e#10378#10379#0" expanded="true" />
+                <element signature="e#10476#10477#0" expanded="true" />
                 <element signature="method#fromHumanReadableFile#0;class#Board#0" />
                 <element signature="method#getPiecesNotOnBoard#0;class#Board#0" />
+                <element signature="method#getAllFittingMoves#0;class#Board#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="62" selection-start-line="12" selection-start-column="62" selection-end-line="12" selection-end-column="62" />
             </state>
           </provider>
         </entry>
@@ -569,15 +584,14 @@
         <option value="$PROJECT_DIR$/src/main/java/Orientation.java" />
         <option value="$PROJECT_DIR$/src/main/java/PieceType.java" />
         <option value="$PROJECT_DIR$/src/main/java/Piece.java" />
-        <option value="$PROJECT_DIR$/src/main/java/Main.java" />
         <option value="$PROJECT_DIR$/src/main/java/Board.java" />
+        <option value="$PROJECT_DIR$/src/main/java/Main.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="27" />
-    <option name="width" value="960" />
-    <option name="height" value="1019" />
+    <option name="width" value="1920" />
+    <option name="height" value="1046" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -661,14 +675,6 @@
               <item name="blokus" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="Board.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
-            </path>
-            <path>
-              <item name="Blokus" type="b2602c69:ProjectViewProjectNode" />
-              <item name="blokus" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -697,11 +703,12 @@
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="current working directory&#9;PSI&#9;JAVA://com.sun.xml.internal.fastinfoset.tools.TransformInputOutput#currentJavaWorkingDirectory" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../askokaappochess" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="settings.editor.selected.configurable" value="preferences.general" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -752,7 +759,7 @@
     <frame x="0" y="0" width="1920" height="1046" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26520813" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26520813" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -761,7 +768,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32905483" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.36199096" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.36199096" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1021,16 +1028,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Piece.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="450">
-          <caret line="113" column="5" selection-start-line="113" selection-start-column="5" selection-end-line="113" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/PieceType.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -1042,13 +1039,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="18" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="26" column="68" lean-forward="true" selection-start-line="26" selection-start-column="68" selection-end-line="26" selection-end-column="68" />
         </state>
       </provider>
     </entry>
@@ -1073,12 +1063,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Board.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/Piece.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="418" column="31" lean-forward="true" selection-start-line="418" selection-start-column="31" selection-end-line="418" selection-end-column="31" />
+        <state relative-caret-position="225">
+          <caret line="222" column="30" selection-start-line="222" selection-start-column="30" selection-end-line="222" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jrt:///usr/lib/jvm/java-1.11.0-openjdk-amd64!/java.base/java/io/FileInputStream.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="62" selection-start-line="12" selection-start-column="62" selection-end-line="12" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Board.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="408" column="90" selection-start-line="408" selection-start-column="90" selection-end-line="408" selection-end-column="90" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#Board#0;class#Board#0" />
+            <element signature="method#initializeBoards#0;class#Board#0" />
+            <element signature="method#isPieceOnBoard#0;class#Board#0" />
+            <element signature="method#putOnBoard#0;class#Board#0" />
+            <element signature="method#safeOffset#0;class#Board#0" />
             <element signature="method#fits#0;class#Board#0" />
             <element signature="method#addToPiecesOnBoard#0;class#Board#0" />
             <element signature="method#isColorOnBoard#0;class#Board#0" />
@@ -1087,10 +1106,11 @@
             <element signature="method#getMatchingChar#0;class#Board#0" />
             <element signature="method#getPieceColorFromChar#0;class#Board#0" />
             <element signature="method#toString#0;class#Board#0" />
-            <element signature="method#save#0;class#Board#0" />
-            <element signature="method#fromFile#0;class#Board#0" />
+            <element signature="e#10378#10379#0" expanded="true" />
+            <element signature="e#10476#10477#0" expanded="true" />
             <element signature="method#fromHumanReadableFile#0;class#Board#0" />
             <element signature="method#getPiecesNotOnBoard#0;class#Board#0" />
+            <element signature="method#getAllFittingMoves#0;class#Board#0" />
           </folding>
         </state>
       </provider>

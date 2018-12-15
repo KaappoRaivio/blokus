@@ -1,9 +1,6 @@
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Board implements java.io.Serializable {
 
@@ -26,12 +23,6 @@ public class Board implements java.io.Serializable {
         errorBoard = new PieceType[20][20];
 
         initializeBoards();
-        System.arra
-    }
-    private Board copy (Board that) {
-
-        Board newInstance = new Board();
-
     }
 
     private void initializeBoards () {
@@ -42,8 +33,6 @@ public class Board implements java.io.Serializable {
             }
         }
     }
-
-
 
     private boolean isPieceOnBoard (Piece piece) {
         switch (piece.getColor()) {
@@ -59,7 +48,6 @@ public class Board implements java.io.Serializable {
                 throw new RuntimeException("Invalid color " + piece.getColor() + "!");
         }
     }
-
 
     public boolean putOnBoard(int baseX, int baseY, Piece piece) {
         if (fits(baseX, baseY, piece)) {
@@ -201,7 +189,6 @@ public class Board implements java.io.Serializable {
         }
     }
 
-
     private void dummyPut (int baseX, int baseY, Piece piece) {
         char[][] mesh = piece.getMesh();
 
@@ -308,12 +295,11 @@ public class Board implements java.io.Serializable {
         return builder.toString();
     }
 
-    public String save() {
-        String path = System.getProperty("user.dir") + "/src/main/resources/boards/" + new Date().toString() + ".ser";
+    public String save (String name) {
+        String path = System.getProperty("user.dir") + "/src/main/resources/boards/" + name + ".ser";
 
 
         File file = new File(path);
-        System.out.println(file.exists());
 
         try {
             if (file.createNewFile()) {
@@ -344,6 +330,10 @@ public class Board implements java.io.Serializable {
       return path;
     }
 
+
+    public String save () {
+        return save(String.valueOf(System.currentTimeMillis() * new Random().nextFloat()));
+    }
     public static Board fromFile (String path, boolean relative) {
         String absolutePath;
 
@@ -353,7 +343,7 @@ public class Board implements java.io.Serializable {
             absolutePath = path;
         }
 
-        Board board = null;
+        Board board;
         try {
             FileInputStream fileIn = new FileInputStream(absolutePath);
 
@@ -407,23 +397,25 @@ public class Board implements java.io.Serializable {
         return moves;
     }
 
+    public Board deepCopy () {
+        Board newBoard;
 
-    public static PieceType[][] deepCopy(PieceType[][] original) {
-    if (original == null) {
-        return null;
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.close();
+
+            InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            newBoard = (Board) objectInputStream.readObject();
+
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return newBoard;
     }
-
-    final PieceType[][] result = new PieceType[original.length][];
-
-    for (int i = 0; i < original.length; i++) {
-        result[i] = Arrays.copyOf(original[i], original[i].length);
-    }
-
-    return result;
-}
-
-
-
 }
 
 
