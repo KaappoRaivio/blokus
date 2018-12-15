@@ -70,6 +70,13 @@ public class Board implements java.io.Serializable {
         return putOnBoard(move.getX(), move.getY(), move.getPiece());
     }
 
+    private PieceType safeOffset(int baseX, int baseY, int offsetX, int offsetY) {
+        try {
+            return board[baseY + offsetY][baseX + offsetX];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return PieceType.EDGE;
+        }
+    }
 
     private boolean fits (int baseX, int baseY, Piece piece) {
         char[][] mesh = piece.getMesh();
@@ -80,41 +87,64 @@ public class Board implements java.io.Serializable {
 
         boolean isConnected = false;
         boolean fits = true;
+        boolean touchesCorner = false;
 
         for (int y = 0; y < mesh.length; y++) {
             for (int x = 0; x < mesh[y].length; x++) {
                 char current = mesh[y][x];
-
                 if (current == Piece.TRANSPARENT) {
                     continue;
                 }
 
-                if (board[y][x] != PieceType.NO_PIECE) {
-                    fits =
-                            false;
+                int absX = baseX + x;
+                int absY = baseY + y;
+
+                if (safeOffset(absX, absY, 0, 0) != PieceType.NO_PIECE) {
+                    fits = false;
                     break;
                 }
 
+                if (!touchesCorner &&
+                        absX == 0 && absY == 0 ||
+                        absX == 0 && absY == board.length - 1 ||
+                        absX == board[absY].length - 1 && absY == 0 ||
+                        absX == board[absY].length - 1 && absY == board.length - 1) {
+
+                    touchesCorner = true;
+                }
+
+
+                PieceType topRight = safeOffset(absX, absY, +1, -1);
+                PieceType topLeft = safeOffset(absX, absY, -1, -1);
+                PieceType bottomRight = safeOffset(absX, absY, +1, +1);
+                PieceType bottomLeft = safeOffset(absX, absY, -1, +1);
+
+
                 if (!isConnected &&
-                       (board[y + baseY + 1][x + baseX + 1] == piece.getColor() ||
-                        board[y + baseY + 1][x + baseX - 1] == piece.getColor() ||
-                        board[y + baseY - 1][x + baseX - 1] == piece.getColor() ||
-                        board[y + baseY - 1][x + baseX + 1] == piece.getColor())
+                       (topRight == piece.getColor() ||
+                        topLeft == piece.getColor() ||
+                        bottomRight == piece.getColor() ||
+                        bottomLeft == piece.getColor())
                     ) {
                     isConnected = true;
                 }
 
-                if (board[y + baseY][x + baseX + 1] == piece.getColor() ||
-                    board[y + baseY][x + baseX - 1] == piece.getColor() ||
-                    board[y + baseY + 1][x + baseX] == piece.getColor() ||
-                    board[y + baseY - 1][x + baseX] == piece.getColor()) {
-                    fits = false;
-                    break;
+                PieceType top = safeOffset(absX, absY, 0, -1);
+                PieceType bottom = safeOffset(absX, absY, 0, +1);
+                PieceType left = safeOffset(absX, absY, -1, 0);
+                PieceType right = safeOffset(absX, absY, +1, 0);
+
+                if (top == piece.getColor() ||
+                    bottom == piece.getColor() ||
+                    left == piece.getColor() ||
+                    right == piece.getColor()) {
+                        fits = false;
+                        break;
                 }
             }
         }
 
-        if (fits && !isColorOnBoard(piece.getColor())) {
+        if (fits && !isColorOnBoard(piece.getColor()) && touchesCorner) {
             isConnected = true;
         }
 

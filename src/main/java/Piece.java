@@ -158,28 +158,28 @@ public class Piece implements java.io.Serializable {
         this.mesh = mesh;
     }
 
-    Piece rotate (int orietation, boolean flip) {
+    Piece rotate (Orientation orietation, boolean flip) {
         char[][] newlist = new char[5][5];
 
         switch (orietation) {
-            case Orientation.UP:
+            case UP:
                 newlist = this.mesh;
                 break;
-            case Orientation.DOWN:
+            case DOWN:
                 for (int y = 0; y < this.mesh.length; y++) {
                     for (int x = 0; x < this.mesh[y].length; x++) {
                         newlist[4 - y][4 - x] = this.mesh[y][x];
                     }
                 }
                 break;
-            case Orientation.RIGHT:
+            case RIGHT:
                 for (int y = 0; y < this.mesh.length; y++) {
                     for (int x = 0; x < this.mesh[y].length; x++) {
                         newlist[4 - x][y] = this.mesh[y][x];
                     }
                 }
                 break;
-            case Orientation.LEFT:
+            case LEFT:
                 for (int y = 0; y < this.mesh.length; y++) {
                     for (int x = 0; x < this.mesh[y].length; x++) {
                         newlist[x][4 - y] = this.mesh[y][x];

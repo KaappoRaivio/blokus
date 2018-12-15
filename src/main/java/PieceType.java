@@ -3,5 +3,6 @@ enum PieceType {
     RED,
     GREEN,
     YELLOW,
-    NO_PIECE
+    NO_PIECE,
+    EDGE
 }

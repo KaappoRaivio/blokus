@@ -1,4 +1,13 @@
 public class Move implements java.io.Serializable {
+    @Override
+    public String toString() {
+        return "Move(" +
+                "x=" + x +
+                ", y=" + y +
+                ", piece=" + piece +
+                ')';
+    }
+
     private int x;
     private int y;
 
