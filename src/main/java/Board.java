@@ -1,6 +1,7 @@
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +26,12 @@ public class Board implements java.io.Serializable {
         errorBoard = new PieceType[20][20];
 
         initializeBoards();
+        System.arra
+    }
+    private Board copy (Board that) {
+
+        Board newInstance = new Board();
+
     }
 
     private void initializeBoards () {
@@ -237,7 +244,6 @@ public class Board implements java.io.Serializable {
         }
     }
 
-
     private static char getMatchingChar (PieceType color) {
         switch (color) {
             case BLUE:
@@ -271,7 +277,6 @@ public class Board implements java.io.Serializable {
                 throw new RuntimeException("Invalid color " + color + "!");
         }
     }
-
 
     public PieceType[][] getBoard() {
         return board;
@@ -403,6 +408,19 @@ public class Board implements java.io.Serializable {
     }
 
 
+    public static PieceType[][] deepCopy(PieceType[][] original) {
+    if (original == null) {
+        return null;
+    }
+
+    final PieceType[][] result = new PieceType[original.length][];
+
+    for (int i = 0; i < original.length; i++) {
+        result[i] = Arrays.copyOf(original[i], original[i].length);
+    }
+
+    return result;
+}
 
 
 

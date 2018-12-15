@@ -1,6 +1,8 @@
 import java.util.List;
 
 public class Main {
+    public static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+
     public static void main (String[] args) {
 //        Board board = Board.fromFile("/home/kaappo/git/blokus/src/main/resources/boards/Fri Dec 14 14:26:31 CET 2018.ser", false);
         Board board = new Board();
@@ -20,13 +22,18 @@ public class Main {
 
         System.out.println(board);
 
+        long aikaAlussa = System.currentTimeMillis();
+
         List<Move> moves = board.getAllFittingMoves(PieceType.BLUE);
+
+        long aikaLopussa = System.currentTimeMillis();
 
         for (Move move : moves) {
             System.out.println(move);
         }
 
         System.out.println(moves.size());
+        System.out.println((aikaLopussa - aikaAlussa) / 1000.0);
 
 //        String path = board.save();
 //        System.out.println(path);
