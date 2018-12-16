@@ -2,6 +2,7 @@
 import java.io.*;
 import java.util.*;
 
+
 public class Board implements java.io.Serializable {
 
     private List<Piece> bluePiecesOnBoard = new ArrayList<>();
@@ -330,10 +331,10 @@ public class Board implements java.io.Serializable {
       return path;
     }
 
-
     public String save () {
         return save(String.valueOf(System.currentTimeMillis() * new Random().nextFloat()));
     }
+
     public static Board fromFile (String path, boolean relative) {
         String absolutePath;
 
@@ -359,7 +360,7 @@ public class Board implements java.io.Serializable {
         return board;
     }
 
-    public static Board fromHumanReadableFile (String filePath, boolean absolute) {
+    public static Board fromHumanReadableFile (String filePath, boolean relative) {
         throw new RuntimeException(new NotImplementedError());
     }
 
@@ -376,6 +377,46 @@ public class Board implements java.io.Serializable {
             default:
                 throw new RuntimeException("Invalid color " + color);
         }
+    }
+
+    public List<Span> splitBoardInto (int amountOfChunks) {
+
+        List<Span> spans = new ArrayList<>();
+
+        int remainder = 400 % amountOfChunks;
+        int step = 400 / amountOfChunks;
+
+        int x = 0;
+        int y = 0;
+
+        while (y < board.length) {
+            int length;
+            System.out.println("" + x + " " + y);
+            if (remainder != 0) {
+                length = step + 1;
+                remainder -= 1;
+            } else {
+                length = step;
+            }
+
+            int newY = length / 20;
+            int newX = length % 20;
+
+            spans.add(new Span(new Position(x, y), new Position(x + newX, y + newY)));
+
+            x += newX;
+            y += newY;
+
+
+        }
+
+        return spans;
+    }
+
+
+    public List<Move> getAllFittingMovesParallel() {
+        List<Span> spans = splitBoardInto(Main.NUMBER_OF_CORES);
+        return null;
     }
 
     public List<Move> getAllFittingMoves (PieceType color) {
@@ -416,7 +457,51 @@ public class Board implements java.io.Serializable {
 
         return newBoard;
     }
-}
 
+//    public static class WorkerThread implements Runnable {
+//
+//        private Board board;
+//        private int x1;
+//        private int x2;
+//        private int y1;
+//        private int y2;
+//        private PieceType pieceType;
+//        private List<Move> moves = new ArrayList<>();
+//
+//        public WorkerThread (Board board, int x1, int y1, int x2, int y2, PieceType pieceType) {
+//            this.x1 = x1;
+//            this.x2 = x2;
+//            this.y1 = y1;
+//            this.y2 = y2;
+//
+//            this.board = board;
+//            this.pieceType = pieceType;
+//        }
+//
+//        @Override
+//        public void run() {
+//            List<Piece> pieces = board.getPiecesNotOnBoard(color);
+//
+//            for (int y = y1; y < y2; y++) {
+//                for (int x = x1; x < x2; x++) {
+//                    for (Piece notRotated : pieces) {
+//                        for (Piece piece : notRotated.getAllOrientations()) {
+//                            if (board.fits(x, y, piece)) {
+//                                moves.add(new Move(x, y, piece));
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        public List<Move> getResult () {
+//            return moves;
+//        }
+//
+//
+//    }
+
+}
 
 class NotImplementedError extends Exception {}
