@@ -109,7 +109,6 @@ public class Board implements java.io.Serializable {
                     touchesCorner = true;
                 }
 
-
                 PieceType topRight = safeOffset(absX, absY, +1, -1);
                 PieceType topLeft = safeOffset(absX, absY, -1, -1);
                 PieceType bottomRight = safeOffset(absX, absY, +1, +1);
@@ -461,19 +460,12 @@ public class Board implements java.io.Serializable {
 //    public static class WorkerThread implements Runnable {
 //
 //        private Board board;
-//        private int x1;
-//        private int x2;
-//        private int y1;
-//        private int y2;
+//        private Span span;
 //        private PieceType pieceType;
 //        private List<Move> moves = new ArrayList<>();
 //
-//        public WorkerThread (Board board, int x1, int y1, int x2, int y2, PieceType pieceType) {
-//            this.x1 = x1;
-//            this.x2 = x2;
-//            this.y1 = y1;
-//            this.y2 = y2;
-//
+//        public WorkerThread (Board board, Span span, PieceType pieceType) {
+//            this.span = span;
 //            this.board = board;
 //            this.pieceType = pieceType;
 //        }
