@@ -5,52 +5,54 @@ import java.util.*;
 
 public class Board implements java.io.Serializable {
 
-    private List<Piece> bluePiecesOnBoard = new ArrayList<>();
-    private List<Piece> redPiecesOnBoard = new ArrayList<>();
-    private List<Piece> greenPiecesOnBoard = new ArrayList<>();
-    private List<Piece> yellowPiecesOnBoard = new ArrayList<>();
-
-    private List<Piece> bluePiecesNotOnBoard = Piece.getAllPieces(PieceType.BLUE);
-    private List<Piece> redPiecesNotOnBoard = Piece.getAllPieces(PieceType.RED);
-    private List<Piece> greenPiecesNotOnBoard = Piece.getAllPieces(PieceType.GREEN);
-    private List<Piece> yellowPiecesNotOnBoard = Piece.getAllPieces(PieceType.YELLOW);
+    private static final int NO_PIECE = -1;
+    private static final int EDGE = -1;
 
 
-    private PieceType[][] board;
-    private PieceType[][] errorBoard;
+    private int[][] board;
+    private int[][] errorBoard;
 
-    Board () {
-        board = new PieceType[20][20];
-        errorBoard = new PieceType[20][20];
+    private int dimX;
+    private int dimY;
+    private int amountOfPlayers;
+
+    private List< List<BasePiece> > piecesNotOnBoard = new ArrayList<>();
+    private List< List<BasePiece> > piecesOnBoard = new ArrayList<>();
+
+    Board (int dimX, int dimY, int amountOfPlayers, Class<? extends BasePiece> baseBasePiece) {
+        this.dimX = dimX;
+        this.dimY = dimY;
+        this.amountOfPlayers = amountOfPlayers;
+
+
+        board = new int[dimY][dimX];
+        errorBoard = new int[dimY][dimX];
+
+        for (int i = 0; i < amountOfPlayers; i++) {
+            try {
+                this.piecesNotOnBoard.add((List<BasePiece>) baseBasePiece.getMethod("getAllPieces", int.class).invoke(null, i));
+                this.piecesOnBoard.add(new ArrayList<>());
+            } catch (Exception ignored) {}
+        }
 
         initializeBoards();
+
     }
 
     private void initializeBoards () {
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board[y].length; x++) {
-                errorBoard[y][x] = PieceType.NO_PIECE;
-                board[y][x] = PieceType.NO_PIECE;
+        for (int y = 0; y < dimY; y++) {
+            for (int x = 0; x < dimX; x++) {
+                errorBoard[y][x] = NO_PIECE;
+                board[y][x] = NO_PIECE;
             }
         }
     }
 
-    private boolean isPieceOnBoard (Piece piece) {
-        switch (piece.getColor()) {
-            case BLUE:
-                return bluePiecesOnBoard.contains(piece);
-            case RED:
-                return redPiecesOnBoard.contains(piece);
-            case YELLOW:
-                return yellowPiecesOnBoard.contains(piece);
-            case GREEN:
-                return greenPiecesOnBoard.contains(piece);
-            default:
-                throw new RuntimeException("Invalid color " + piece.getColor() + "!");
-        }
+    private boolean isPieceOnBoard (BasePiece piece) {
+        return piece.isOnBoard();
     }
 
-    public boolean putOnBoard(int baseX, int baseY, Piece piece) {
+    public boolean putOnBoard(int baseX, int baseY, BasePiece piece) {
         if (fits(baseX, baseY, piece)) {
             dummyPut(baseX, baseY, piece);
             addToPiecesOnBoard(piece);
@@ -66,15 +68,15 @@ public class Board implements java.io.Serializable {
         return putOnBoard(move.getX(), move.getY(), move.getPiece());
     }
 
-    private PieceType safeOffset(int baseX, int baseY, int offsetX, int offsetY) {
+    private int safeOffset(int baseX, int baseY, int offsetX, int offsetY) {
         try {
             return board[baseY + offsetY][baseX + offsetX];
         } catch (ArrayIndexOutOfBoundsException e) {
-            return PieceType.EDGE;
+            return EDGE;
         }
     }
 
-    private boolean fits (int baseX, int baseY, Piece piece) {
+    private boolean fits (int baseX, int baseY, BasePiece piece) {
         char[][] mesh = piece.getMesh();
 
         if (isPieceOnBoard(piece)) {
@@ -95,24 +97,24 @@ public class Board implements java.io.Serializable {
                 int absX = baseX + x;
                 int absY = baseY + y;
 
-                if (safeOffset(absX, absY, 0, 0) != PieceType.NO_PIECE) {
+                if (safeOffset(absX, absY, 0, 0) != NO_PIECE) {
                     fits = false;
                     break;
                 }
 
                 if (!touchesCorner &&
                         absX == 0 && absY == 0 ||
-                        absX == 0 && absY == board.length - 1 ||
-                        absX == board[absY].length - 1 && absY == 0 ||
-                        absX == board[absY].length - 1 && absY == board.length - 1) {
+                        absX == 0 && absY == dimY - 1 ||
+                        absX == dimX - 1 && absY == 0 ||
+                        absX == dimX - 1 && absY == dimY - 1) {
 
                     touchesCorner = true;
                 }
 
-                PieceType topRight = safeOffset(absX, absY, +1, -1);
-                PieceType topLeft = safeOffset(absX, absY, -1, -1);
-                PieceType bottomRight = safeOffset(absX, absY, +1, +1);
-                PieceType bottomLeft = safeOffset(absX, absY, -1, +1);
+                int topRight = safeOffset(absX, absY, +1, -1);
+                int topLeft = safeOffset(absX, absY, -1, -1);
+                int bottomRight = safeOffset(absX, absY, +1, +1);
+                int bottomLeft = safeOffset(absX, absY, -1, +1);
 
 
                 if (!isConnected &&
@@ -124,10 +126,10 @@ public class Board implements java.io.Serializable {
                     isConnected = true;
                 }
 
-                PieceType top = safeOffset(absX, absY, 0, -1);
-                PieceType bottom = safeOffset(absX, absY, 0, +1);
-                PieceType left = safeOffset(absX, absY, -1, 0);
-                PieceType right = safeOffset(absX, absY, +1, 0);
+                int top = safeOffset(absX, absY, 0, -1);
+                int bottom = safeOffset(absX, absY, 0, +1);
+                int left = safeOffset(absX, absY, -1, 0);
+                int right = safeOffset(absX, absY, +1, 0);
 
                 if (top == piece.getColor() ||
                     bottom == piece.getColor() ||
@@ -143,6 +145,7 @@ public class Board implements java.io.Serializable {
             isConnected = true;
         }
 
+        System.out.println(fits + " " + isConnected);
 
         if (fits && isConnected) {
             return true;
@@ -152,44 +155,16 @@ public class Board implements java.io.Serializable {
 
     }
 
-    private void addToPiecesOnBoard (Piece piece) {
-        switch (piece.getColor()) {
-            case BLUE:
-                bluePiecesOnBoard.add(piece);
-                bluePiecesNotOnBoard.remove(piece);
-                break;
-            case RED:
-                redPiecesOnBoard.add(piece);
-                redPiecesNotOnBoard.remove(piece);
-                break;
-            case YELLOW:
-                yellowPiecesOnBoard.add(piece);
-                yellowPiecesNotOnBoard.remove(piece);
-                break;
-            case GREEN:
-                greenPiecesOnBoard.add(piece);
-                greenPiecesNotOnBoard.remove(piece);
-                break;
-
-        }
+    private void addToPiecesOnBoard (BasePiece piece) {
+        piecesOnBoard.get(piece.getColor()).add(piece);
+        piecesNotOnBoard.get(piece.getColor()).remove(piece);
     }
 
-    private boolean isColorOnBoard (PieceType color) {
-        switch (color) {
-            case BLUE:
-                return !bluePiecesOnBoard.isEmpty();
-            case RED:
-                return !redPiecesOnBoard.isEmpty();
-            case YELLOW:
-                return !yellowPiecesOnBoard.isEmpty();
-            case GREEN:
-                return !greenPiecesOnBoard.isEmpty();
-            default:
-                throw new RuntimeException("Invalid color " + color + "!");
-        }
+    private boolean isColorOnBoard (int color) {
+        return !piecesOnBoard.get(color).isEmpty();
     }
 
-    private void dummyPut (int baseX, int baseY, Piece piece) {
+    private void dummyPut (int baseX, int baseY, BasePiece piece) {
         char[][] mesh = piece.getMesh();
 
         for (int y = 0; y < mesh.length; y++) {
@@ -210,7 +185,7 @@ public class Board implements java.io.Serializable {
         }
     }
 
-    private void errorPut (int baseX, int baseY, Piece piece) {
+    private void errorPut (int baseX, int baseY, BasePiece piece) {
         char[][] mesh = piece.getMesh();
 
         for (int y = 0; y < mesh.length; y++) {
@@ -231,52 +206,29 @@ public class Board implements java.io.Serializable {
         }
     }
 
-    private static char getMatchingChar (PieceType color) {
-        switch (color) {
-            case BLUE:
-                return 'B';
-            case RED:
-                return 'R';
-            case GREEN:
-                return 'G';
-            case YELLOW:
-                return 'Y';
-            case NO_PIECE:
-                return '░';
-            default:
-                throw new RuntimeException("Invalid color " + color + "!");
+    private static char getMatchingChar (int color) {
+        if (color == -1) {
+            return Piece.TRANSPARENT;
         }
+        return (char) (color + 48);
     }
 
-    private static PieceType getPieceColorFromChar (char color) {
-        switch (color) {
-            case 'B':
-                return PieceType.BLUE;
-            case 'R':
-                return PieceType.RED;
-            case 'Y':
-                return PieceType.YELLOW;
-            case 'G':
-                return PieceType.GREEN;
-            case '░':
-                return PieceType.NO_PIECE;
-            default:
-                throw new RuntimeException("Invalid color " + color + "!");
-        }
+    private static int getPieceColorFromChar (char color) {
+        return ((int) color) - 48;
     }
 
-    public PieceType[][] getBoard() {
+    public int[][] getBoard() {
         return board;
     }
 
     public String toString () {
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 0; i < board.length; i++) {
-            PieceType[] row = board[i];
+        for (int i = 0; i < dimY; i++) {
+            int[] row = board[i];
             builder.append("\n");
             for (int index = 0; index < row.length - 1; index++) {
-                if (errorBoard[i][index] != PieceType.NO_PIECE) {
+                if (errorBoard[i][index] != NO_PIECE) {
                     builder.append('E');
                 } else {
                     builder.append(getMatchingChar(row[index]));
@@ -284,7 +236,7 @@ public class Board implements java.io.Serializable {
                 builder.append(" ");
             }
 
-            if (errorBoard[i][row.length - 1] != PieceType.NO_PIECE) {
+            if (errorBoard[i][row.length - 1] != NO_PIECE) {
                 builder.append('E');
             } else {
                 builder.append(getMatchingChar(row[row.length - 1]));
@@ -363,19 +315,8 @@ public class Board implements java.io.Serializable {
         throw new RuntimeException(new NotImplementedError());
     }
 
-    private List<Piece> getPiecesNotOnBoard (PieceType color) {
-        switch (color) {
-            case BLUE:
-                return bluePiecesNotOnBoard;
-            case RED:
-                return redPiecesNotOnBoard;
-            case GREEN:
-                return greenPiecesNotOnBoard;
-            case YELLOW:
-                return yellowPiecesNotOnBoard;
-            default:
-                throw new RuntimeException("Invalid color " + color);
-        }
+    private List<BasePiece> getPiecesNotOnBoard (int color) {
+        return (List<BasePiece>) piecesNotOnBoard.get(color);
     }
 
     public List<Span> splitBoardInto (int amountOfChunks) {
@@ -419,7 +360,7 @@ public class Board implements java.io.Serializable {
     }
 
 
-    public List<Move> getAllFittingMovesParallel(PieceType color) {
+    public List<Move> getAllFittingMovesParallel(int color) {
 
         List<Move> result = new ArrayList<>();
         List<Span> spans = splitBoardInto(Main.NUMBER_OF_CORES);
@@ -444,15 +385,15 @@ public class Board implements java.io.Serializable {
         return result;
     }
 
-    public List<Move> getAllFittingMoves (PieceType color) {
-        List<Piece> pieces = getPiecesNotOnBoard(color);
+    public List<Move> getAllFittingMoves (int color) {
+        List<BasePiece> pieces = getPiecesNotOnBoard(color);
         List<Move> moves = new ArrayList<>();
 
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board[y].length; x++) {
-                for (Piece notRotated : pieces) {
-                    for (Piece piece : notRotated.getAllOrientations()) {
-                        if (fits(x, y, piece)) {
+        for (int y = 0; y < dimY; y++) {
+            for (int x = 0; x < dimX; x++) {
+                for (BasePiece notRotated : pieces) {
+                    for (BasePiece piece : notRotated.getAllOrientations()) {
+                        if (fits(x, y, (BasePiece) piece)) {
                             moves.add(new Move(x, y, piece));
                         }
                     }
@@ -483,14 +424,26 @@ public class Board implements java.io.Serializable {
         return newBoard;
     }
 
-    public static class WorkerThread extends Thread {
+    public int getDimX() {
+        return dimX;
+    }
 
-        private final PieceType color;
+    public int getDimY() {
+        return dimY;
+    }
+
+    public int getAmountOfPlayers() {
+        return amountOfPlayers;
+    }
+
+    public class WorkerThread extends Thread {
+
+        private final int color;
         private Board board;
         private Span span;
         private List<Move> moves = new ArrayList<>();
 
-        public WorkerThread (Board board, Span span, PieceType color) {
+        public WorkerThread (Board board, Span span, int color) {
             super();
 
             this.board = board;
@@ -500,11 +453,11 @@ public class Board implements java.io.Serializable {
 
         @Override
         public void run() {
-            List<Piece> pieces = board.getPiecesNotOnBoard(color);
+            List<BasePiece> pieces = board.getPiecesNotOnBoard(color);
 
             for (Position position : span) {
-                for (Piece notRotated : pieces) {
-                    for (Piece piece : notRotated.getAllOrientations()) {
+                for (BasePiece notRotated : pieces) {
+                    for (BasePiece piece : notRotated.getAllOrientations()) {
                         if (board.fits(position.x, position.y, piece)) {
                             moves.add(new Move(position.x, position.y, piece));
                         }

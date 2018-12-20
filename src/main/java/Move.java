@@ -10,14 +10,14 @@ public class Move implements java.io.Serializable {
 
     private int x;
     private int y;
+    private BasePiece piece;
 
-    public Move(int x, int y, Piece piece) {
+    public Move(int x, int y, BasePiece piece) {
         this.x = x;
         this.y = y;
         this.piece = piece;
     }
 
-    private Piece piece;
 
     public int getX() {
         return x;
@@ -27,7 +27,7 @@ public class Move implements java.io.Serializable {
         return y;
     }
 
-    public Piece getPiece() {
+    public BasePiece getPiece() {
         return piece;
     }
 }

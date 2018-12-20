@@ -1,48 +1,44 @@
-import com.google.common.base.Charsets;
-
-import com.google.common.io.Resources;
-
-import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class Piece implements java.io.Serializable {
-    public static final String PIECE_1 = "pieces/piece1.txt";
-    public static final String PIECE_2 = "pieces/piece2.txt";
-    public static final String PIECE_3 = "pieces/piece3.txt";
-    public static final String PIECE_4 = "pieces/piece4.txt";
-    public static final String PIECE_5 = "pieces/piece5.txt";
-    public static final String PIECE_6 = "pieces/piece6.txt";
-    public static final String PIECE_7 = "pieces/piece7.txt";
-    public static final String PIECE_8 = "pieces/piece8.txt";
-    public static final String PIECE_9 = "pieces/piece9.txt";
-    public static final String PIECE_10 = "pieces/piece10.txt";
-    public static final String PIECE_11 = "pieces/piece11.txt";
-    public static final String PIECE_12 = "pieces/piece12.txt";
-    public static final String PIECE_13 = "pieces/piece13.txt";
-    public static final String PIECE_14 = "pieces/piece14.txt";
-    public static final String PIECE_15 = "pieces/piece15.txt";
-    public static final String PIECE_16 = "pieces/piece16.txt";
-    public static final String PIECE_17 = "pieces/piece17.txt";
-    public static final String PIECE_18 = "pieces/piece18.txt";
-    public static final String PIECE_19 = "pieces/piece19.txt";
-    public static final String PIECE_20 = "pieces/piece20.txt";
-    public static final String PIECE_21 = "pieces/piece21.txt";
+public class Piece extends BasePiece implements java.io.Serializable {
+    private static final List<String> paths = Arrays.asList(
+            "pieces/piece1.txt",
+            "pieces/piece2.txt",
+            "pieces/piece3.txt",
+            "pieces/piece4.txt",
+            "pieces/piece5.txt",
+            "pieces/piece6.txt",
+            "pieces/piece7.txt",
+            "pieces/piece8.txt",
+            "pieces/piece9.txt",
+            "pieces/piece10.txt",
+            "pieces/piece11.txt",
+            "pieces/piece12.txt",
+            "pieces/piece13.txt",
+            "pieces/piece14.txt",
+            "pieces/piece15.txt",
+            "pieces/piece16.txt",
+            "pieces/piece17.txt",
+            "pieces/piece18.txt",
+            "pieces/piece19.txt",
+            "pieces/piece20.txt",
+            "pieces/piece21.txt"
+    );
+
 
     public static final char OPAQUE = '#';
     public static final char TRANSPARENT = '.';
 
     private char[][] mesh = new char[5][5];
-    private PieceType color;
+    private int color;
 
     private int posX = -1;
     private int posY = -1;
     private boolean onBoard = false;
+    private PieceID id;
 
     public int getPosX() {
         return posX;
@@ -63,25 +59,17 @@ public class Piece implements java.io.Serializable {
         this.posY = posY;
     }
 
+    public PieceID getID () {
+        return id;
+    }
 
     public char[][] getMesh() {
         return mesh;
     }
 
 
-    private static boolean isValid (PieceType color) {
-        switch (color) {
-            case BLUE:
-                return true;
-            case RED:
-                return true;
-            case GREEN:
-                return true;
-            case YELLOW:
-                return true;
-            default:
-                return false;
-        }
+    private static boolean isValid (int color) {
+        return true;
     }
 
     private void initializeMesh () {
@@ -92,7 +80,7 @@ public class Piece implements java.io.Serializable {
         }
     }
 
-    public Piece (String filename, PieceType color) {
+    public Piece (PieceID pieceID, int color) {
         if (isValid(color)) {
             this.color = color;
         } else {
@@ -101,7 +89,7 @@ public class Piece implements java.io.Serializable {
 
         initializeMesh();
 
-        String text = new Scanner(this.getClass().getResourceAsStream(filename), StandardCharsets.UTF_8).useDelimiter("\\A").next();
+        String text = new Scanner(this.getClass().getResourceAsStream(paths.get(pieceID.ordinal())), StandardCharsets.UTF_8).useDelimiter("\\A").next();
         String[] lines = text.split("\n");
 
         for (int y = 0; y < lines.length; y++) {
@@ -110,6 +98,8 @@ public class Piece implements java.io.Serializable {
                 this.mesh[x][y] = current == Piece.TRANSPARENT || current == Piece.OPAQUE ? current : Piece.TRANSPARENT;
             }
         }
+
+        this.id = pieceID;
 
     }
 
@@ -153,12 +143,12 @@ public class Piece implements java.io.Serializable {
         moveUp();
     }
 
-    private Piece (char[][] mesh, PieceType color) {
+    private Piece (char[][] mesh, int color) {
         this.color = color;
         this.mesh = mesh;
     }
 
-    Piece rotate (Orientation orietation, boolean flip) {
+    public Piece rotate (Orientation orietation, boolean flip) {
         char[][] newlist = new char[5][5];
 
         switch (orietation) {
@@ -207,7 +197,7 @@ public class Piece implements java.io.Serializable {
 
     }
 
-    public List<Piece> getAllOrientations () {
+    public List<BasePiece> getAllOrientations () {
         return Arrays.asList(
                 rotate(Orientation.UP, false),
                 rotate(Orientation.RIGHT, false),
@@ -220,33 +210,33 @@ public class Piece implements java.io.Serializable {
         );
     }
 
-    public static List<Piece> getAllPieces (PieceType color) {
+    public static List<BasePiece> getAllPieces (int color) {
         return Arrays.asList(
-                new Piece(PIECE_1, color),
-                new Piece(PIECE_2, color),
-                new Piece(PIECE_3, color),
-                new Piece(PIECE_4, color),
-                new Piece(PIECE_5, color),
-                new Piece(PIECE_6, color),
-                new Piece(PIECE_7, color),
-                new Piece(PIECE_8, color),
-                new Piece(PIECE_9, color),
-                new Piece(PIECE_10, color),
-                new Piece(PIECE_11, color),
-                new Piece(PIECE_12, color),
-                new Piece(PIECE_13, color),
-                new Piece(PIECE_14, color),
-                new Piece(PIECE_15, color),
-                new Piece(PIECE_16, color),
-                new Piece(PIECE_17, color),
-                new Piece(PIECE_18, color),
-                new Piece(PIECE_19, color),
-                new Piece(PIECE_20, color),
-                new Piece(PIECE_21, color)
+                new Piece(PieceID.PIECE_1, color),
+                new Piece(PieceID.PIECE_2, color),
+                new Piece(PieceID.PIECE_3, color),
+                new Piece(PieceID.PIECE_4, color),
+                new Piece(PieceID.PIECE_5, color),
+                new Piece(PieceID.PIECE_6, color),
+                new Piece(PieceID.PIECE_7, color),
+                new Piece(PieceID.PIECE_8, color),
+                new Piece(PieceID.PIECE_9, color),
+                new Piece(PieceID.PIECE_10, color),
+                new Piece(PieceID.PIECE_11, color),
+                new Piece(PieceID.PIECE_12, color),
+                new Piece(PieceID.PIECE_13, color),
+                new Piece(PieceID.PIECE_14, color),
+                new Piece(PieceID.PIECE_15, color),
+                new Piece(PieceID.PIECE_16, color),
+                new Piece(PieceID.PIECE_17, color),
+                new Piece(PieceID.PIECE_18, color),
+                new Piece(PieceID.PIECE_19, color),
+                new Piece(PieceID.PIECE_20, color),
+                new Piece(PieceID.PIECE_21, color)
         );
     }
 
-    public PieceType getColor() {
+    public int getColor() {
         return this.color;
     }
 
@@ -260,5 +250,15 @@ public class Piece implements java.io.Serializable {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public boolean isOnBoard() {
+        return onBoard;
+    }
+
+    @Override
+    public void setOnBoard(boolean set) {
+        this.onBoard = set;
     }
 }

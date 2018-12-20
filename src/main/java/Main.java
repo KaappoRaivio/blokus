@@ -1,25 +1,13 @@
-import java.util.Arrays;
-import java.util.List;
-
 public class Main {
     public static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
     public static void main (String[] args) {
-        Board board = new Board();
+        Board board = new Board(20, 20, 4, Piece.class);
 
+        board.putOnBoard(0, 0, new Piece(PieceID.PIECE_19, 0).rotate(Orientation.LEFT, false));
+        board.putOnBoard(3, 0, new Piece(PieceID.PIECE_14, 0));
+        System.out.println(board);
 
-        float[] asd = new float[10000];
-        for (int i = 0; i < 10000; i++) {
-            long alku = System.currentTimeMillis();
-            board.getAllFittingMovesParallel(PieceType.BLUE);
-//            board.splitBoardInto(4);
-//            board.deepCopy();
-            long loppu = System.currentTimeMillis();
-
-            asd[i] = (loppu - alku) / 1000f;
-
-        }
-        System.out.println(sum(asd) / asd.length);
 
     }
 
