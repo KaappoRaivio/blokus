@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class Piece extends BasePiece implements java.io.Serializable {
+public class Piece extends BasePiece<Piece> implements java.io.Serializable {
     private static final List<String> paths = Arrays.asList(
             "pieces/piece1.txt",
             "pieces/piece2.txt",
@@ -39,6 +39,8 @@ public class Piece extends BasePiece implements java.io.Serializable {
     private int posY = -1;
     private boolean onBoard = false;
     private PieceID id;
+    private Orientation orientation;
+    private boolean flipped;
 
     public int getPosX() {
         return posX;
@@ -50,6 +52,7 @@ public class Piece extends BasePiece implements java.io.Serializable {
 
 
     public void placeOnBoard (int posX, int posY) {
+        System.out.println("asdasdasd" + onBoard + this.posX + this.posY);
         if (onBoard) {
             throw new RuntimeException("Piece " + this.toString() + " is already on board at coordnates " + this.posX + ", " + this.posY + "!");
         }
@@ -61,6 +64,14 @@ public class Piece extends BasePiece implements java.io.Serializable {
 
     public PieceID getID () {
         return id;
+    }
+
+    public Orientation getOrientation() {
+        return orientation;
+    }
+
+    public boolean isFlipped() {
+        return this.flipped;
     }
 
     public char[][] getMesh() {
@@ -100,7 +111,26 @@ public class Piece extends BasePiece implements java.io.Serializable {
         }
 
         this.id = pieceID;
+        this.orientation = Orientation.UP;
+        this.flipped = false;
 
+    }
+
+    private Piece (char[][] mesh, int color, PieceID pieceID, Orientation orientation, boolean flipped, boolean isOnBoard) {
+        if (isValid(color)) {
+            this.color = color;
+        } else {
+            throw new RuntimeException("Invalid color " + color + "!");
+        }
+
+        initializeMesh();
+
+        this.mesh = mesh;
+
+        this.id = pieceID;
+        this.orientation = orientation;
+        this.flipped = flipped;
+        this.onBoard = isOnBoard;
     }
 
     private void moveLeft () {
@@ -141,11 +171,6 @@ public class Piece extends BasePiece implements java.io.Serializable {
         }
 
         moveUp();
-    }
-
-    private Piece (char[][] mesh, int color) {
-        this.color = color;
-        this.mesh = mesh;
     }
 
     public Piece rotate (Orientation orietation, boolean flip) {
@@ -189,7 +214,7 @@ public class Piece extends BasePiece implements java.io.Serializable {
         } else {
             afterFlip = newlist;
         }
-        Piece piece = new Piece(afterFlip, this.color);
+        Piece piece = new Piece(afterFlip, this.color, this.getID(), this.getOrientation(), this.isFlipped(), this.isOnBoard());
         piece.moveLeft();
         piece.moveUp();
 
@@ -197,7 +222,7 @@ public class Piece extends BasePiece implements java.io.Serializable {
 
     }
 
-    public List<BasePiece> getAllOrientations () {
+    public List<Piece> getAllOrientations () {
         return Arrays.asList(
                 rotate(Orientation.UP, false),
                 rotate(Orientation.RIGHT, false),
@@ -210,29 +235,30 @@ public class Piece extends BasePiece implements java.io.Serializable {
         );
     }
 
-    public static List<BasePiece> getAllPieces (int color) {
+
+    public static List<PieceID> getAllPieces (int pieceColor) {
         return Arrays.asList(
-                new Piece(PieceID.PIECE_1, color),
-                new Piece(PieceID.PIECE_2, color),
-                new Piece(PieceID.PIECE_3, color),
-                new Piece(PieceID.PIECE_4, color),
-                new Piece(PieceID.PIECE_5, color),
-                new Piece(PieceID.PIECE_6, color),
-                new Piece(PieceID.PIECE_7, color),
-                new Piece(PieceID.PIECE_8, color),
-                new Piece(PieceID.PIECE_9, color),
-                new Piece(PieceID.PIECE_10, color),
-                new Piece(PieceID.PIECE_11, color),
-                new Piece(PieceID.PIECE_12, color),
-                new Piece(PieceID.PIECE_13, color),
-                new Piece(PieceID.PIECE_14, color),
-                new Piece(PieceID.PIECE_15, color),
-                new Piece(PieceID.PIECE_16, color),
-                new Piece(PieceID.PIECE_17, color),
-                new Piece(PieceID.PIECE_18, color),
-                new Piece(PieceID.PIECE_19, color),
-                new Piece(PieceID.PIECE_20, color),
-                new Piece(PieceID.PIECE_21, color)
+                PieceID.PIECE_0,
+                PieceID.PIECE_1,
+                PieceID.PIECE_2,
+                PieceID.PIECE_3,
+                PieceID.PIECE_4,
+                PieceID.PIECE_5,
+                PieceID.PIECE_6,
+                PieceID.PIECE_7,
+                PieceID.PIECE_8,
+                PieceID.PIECE_9,
+                PieceID.PIECE_10,
+                PieceID.PIECE_11,
+                PieceID.PIECE_12,
+                PieceID.PIECE_13,
+                PieceID.PIECE_14,
+                PieceID.PIECE_15,
+                PieceID.PIECE_16,
+                PieceID.PIECE_17,
+                PieceID.PIECE_18,
+                PieceID.PIECE_19,
+                PieceID.PIECE_20
         );
     }
 
@@ -259,6 +285,10 @@ public class Piece extends BasePiece implements java.io.Serializable {
 
     @Override
     public void setOnBoard(boolean set) {
-        this.onBoard = set;
+//        this.onBoard = set;
+    }
+
+    public static int amountOfUniquePieces () {
+        return 21;
     }
 }

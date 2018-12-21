@@ -1,9 +1,10 @@
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Supplier;
 
 
-public class Board implements java.io.Serializable {
+public class Board<T extends BasePiece<T>> implements java.io.Serializable {
 
     private static final int NO_PIECE = -1;
     private static final int EDGE = -1;
@@ -16,24 +17,19 @@ public class Board implements java.io.Serializable {
     private int dimY;
     private int amountOfPlayers;
 
-    private List< List<BasePiece> > piecesNotOnBoard = new ArrayList<>();
-    private List< List<BasePiece> > piecesOnBoard = new ArrayList<>();
 
-    Board (int dimX, int dimY, int amountOfPlayers, Class<? extends BasePiece> baseBasePiece) {
+    private PieceManager<T> pieceManager;
+
+    Board (int dimX, int dimY, int amountOfPlayers, PieceManager<T> pieceManager) {
         this.dimX = dimX;
         this.dimY = dimY;
         this.amountOfPlayers = amountOfPlayers;
 
+        this.pieceManager = pieceManager;
 
         board = new int[dimY][dimX];
         errorBoard = new int[dimY][dimX];
 
-        for (int i = 0; i < amountOfPlayers; i++) {
-            try {
-                this.piecesNotOnBoard.add((List<BasePiece>) baseBasePiece.getMethod("getAllPieces", int.class).invoke(null, i));
-                this.piecesOnBoard.add(new ArrayList<>());
-            } catch (Exception ignored) {}
-        }
 
         initializeBoards();
 
@@ -52,7 +48,14 @@ public class Board implements java.io.Serializable {
         return piece.isOnBoard();
     }
 
-    public boolean putOnBoard(int baseX, int baseY, BasePiece piece) {
+
+    public boolean putOnBoard(int baseX, int baseY, PieceID pieceID, int color, Orientation orientation, boolean flip) {
+        T piece = pieceManager.getCachedPiece(pieceID, color).rotate(orientation, flip);
+
+        if (pieceManager.isOnBoard(pieceID, color)) {
+            throw new RuntimeException("Piece " + piece + "already on board");
+        }
+
         if (fits(baseX, baseY, piece)) {
             dummyPut(baseX, baseY, piece);
             addToPiecesOnBoard(piece);
@@ -65,7 +68,7 @@ public class Board implements java.io.Serializable {
     }
 
     public boolean putOnBoard (Move move) {
-        return putOnBoard(move.getX(), move.getY(), move.getPiece());
+        return putOnBoard(move.getX(), move.getY(), move.getPieceID(), move.getColor(), move.getOrientation(), move.isFlip());
     }
 
     private int safeOffset(int baseX, int baseY, int offsetX, int offsetY) {
@@ -76,7 +79,7 @@ public class Board implements java.io.Serializable {
         }
     }
 
-    private boolean fits (int baseX, int baseY, BasePiece piece) {
+    private boolean fits (int baseX, int baseY, T piece) {
         char[][] mesh = piece.getMesh();
 
         if (isPieceOnBoard(piece)) {
@@ -147,24 +150,19 @@ public class Board implements java.io.Serializable {
 
         System.out.println(fits + " " + isConnected);
 
-        if (fits && isConnected) {
-            return true;
-        } else {
-            return false;
-        }
+        return fits && isConnected;
 
     }
 
-    private void addToPiecesOnBoard (BasePiece piece) {
-        piecesOnBoard.get(piece.getColor()).add(piece);
-        piecesNotOnBoard.get(piece.getColor()).remove(piece);
+    private void addToPiecesOnBoard (T piece) {
+        pieceManager.placeOnBoard(piece.getID(), piece.getColor());
     }
 
     private boolean isColorOnBoard (int color) {
-        return !piecesOnBoard.get(color).isEmpty();
+        return pieceManager.isColorOnBoard(color);
     }
 
-    private void dummyPut (int baseX, int baseY, BasePiece piece) {
+    private void dummyPut (int baseX, int baseY, T piece) {
         char[][] mesh = piece.getMesh();
 
         for (int y = 0; y < mesh.length; y++) {
@@ -185,7 +183,7 @@ public class Board implements java.io.Serializable {
         }
     }
 
-    private void errorPut (int baseX, int baseY, BasePiece piece) {
+    private void errorPut (int baseX, int baseY, T piece) {
         char[][] mesh = piece.getMesh();
 
         for (int y = 0; y < mesh.length; y++) {
@@ -315,11 +313,11 @@ public class Board implements java.io.Serializable {
         throw new RuntimeException(new NotImplementedError());
     }
 
-    private List<BasePiece> getPiecesNotOnBoard (int color) {
-        return (List<BasePiece>) piecesNotOnBoard.get(color);
+    private List<PieceID> getPiecesNotOnBoard (int color) {
+        return pieceManager.getPiecesNotOnBoard(color);
     }
 
-    public List<Span> splitBoardInto (int amountOfChunks) {
+    private List<Span> splitBoardInto (int amountOfChunks) {
 
         int[] lengths = new int[amountOfChunks];
         int remainder = 400 % amountOfChunks;
@@ -351,12 +349,6 @@ public class Board implements java.io.Serializable {
         }
 
         return spans;
-
-
-
-
-
-
     }
 
 
@@ -386,15 +378,16 @@ public class Board implements java.io.Serializable {
     }
 
     public List<Move> getAllFittingMoves (int color) {
-        List<BasePiece> pieces = getPiecesNotOnBoard(color);
+        List<PieceID> pieces = getPiecesNotOnBoard(color);
         List<Move> moves = new ArrayList<>();
 
         for (int y = 0; y < dimY; y++) {
             for (int x = 0; x < dimX; x++) {
-                for (BasePiece notRotated : pieces) {
-                    for (BasePiece piece : notRotated.getAllOrientations()) {
-                        if (fits(x, y, (BasePiece) piece)) {
-                            moves.add(new Move(x, y, piece));
+                for (PieceID pieceID : pieces) {
+                    T notRotated = pieceManager.getCachedPiece(pieceID, color);
+                    for (T piece : notRotated.getAllOrientations()) {
+                        if (fits(x, y, piece)) {
+                            moves.add(new Move(x, y, piece.getID(), piece.getColor(), piece.getOrientation(), piece.isFlipped()));
                         }
                     }
                 }
@@ -404,8 +397,8 @@ public class Board implements java.io.Serializable {
         return moves;
     }
 
-    public Board deepCopy () {
-        Board newBoard;
+    public Board<T> deepCopy () {
+        Board<T> newBoard;
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -415,7 +408,7 @@ public class Board implements java.io.Serializable {
 
             InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            newBoard = (Board) objectInputStream.readObject();
+            newBoard = (Board<T>) objectInputStream.readObject();
 
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -439,11 +432,11 @@ public class Board implements java.io.Serializable {
     public class WorkerThread extends Thread {
 
         private final int color;
-        private Board board;
+        private Board<T> board;
         private Span span;
         private List<Move> moves = new ArrayList<>();
 
-        public WorkerThread (Board board, Span span, int color) {
+        public WorkerThread (Board<T> board, Span span, int color) {
             super();
 
             this.board = board;
@@ -453,13 +446,14 @@ public class Board implements java.io.Serializable {
 
         @Override
         public void run() {
-            List<BasePiece> pieces = board.getPiecesNotOnBoard(color);
+            List<PieceID> pieces = board.getPiecesNotOnBoard(color);
 
             for (Position position : span) {
-                for (BasePiece notRotated : pieces) {
-                    for (BasePiece piece : notRotated.getAllOrientations()) {
+                for (PieceID pieceID : pieces) {
+                    T notRotated = pieceManager.getCachedPiece(pieceID, color);
+                    for (T piece : notRotated.getAllOrientations()) {
                         if (board.fits(position.x, position.y, piece)) {
-                            moves.add(new Move(position.x, position.y, piece));
+                            moves.add(new Move(position.x, position.y, piece.getID(), piece.getColor(), piece.getOrientation(), piece.isFlipped()));
                         }
                     }
                 }

@@ -1,4 +1,5 @@
 public enum PieceID {
+    PIECE_0,
     PIECE_1,
     PIECE_2,
     PIECE_3,
@@ -18,6 +19,5 @@ public enum PieceID {
     PIECE_17,
     PIECE_18,
     PIECE_19,
-    PIECE_20,
-    PIECE_21
+    PIECE_20
 }
