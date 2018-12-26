@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class Piece extends BasePiece<Piece> implements java.io.Serializable {
+public class Piece implements java.io.Serializable {
     private static final List<String> paths = Arrays.asList(
             "pieces/piece1.txt",
             "pieces/piece2.txt",
@@ -278,12 +278,10 @@ public class Piece extends BasePiece<Piece> implements java.io.Serializable {
         return builder.toString();
     }
 
-    @Override
     public boolean isOnBoard() {
         return onBoard;
     }
 
-    @Override
     public void setOnBoard(boolean set) {
 //        this.onBoard = set;
     }

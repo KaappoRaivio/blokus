@@ -4,23 +4,24 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyPieceManager<T extends BasePiece<T>> implements PieceManager<T>, java.io.Serializable {
-    private List< List<T> > cachedPieces = new ArrayList<>();
+public class MyPieceManager implements PieceManager, java.io.Serializable {
+    private List< List<Piece> > cachedPieces = new ArrayList<>();
     private List< List<PieceID> > piecesOnBoard = new ArrayList<>();
     private List< List<PieceID> > piecesNotOnBoard = new ArrayList<>();
+    private int amountOfPlayers;
 
 //    private boolean[] piecesOnBoard;
 
-    public MyPieceManager (int amountOfColors) {
-        for (int i = 0; i < amountOfColors; i++) {
+    public MyPieceManager (int amountOfPlayers) {
+        for (int i = 0; i < amountOfPlayers; i++) {
             piecesNotOnBoard.add(new ArrayList<>());
             piecesOnBoard.add(new ArrayList<>());
             cachedPieces.add(new ArrayList<>());
 
-            List<PieceID> pieceIDs = T.getAllPieces(i);
+            List<PieceID> pieceIDs = Piece.getAllPieces(i);
             for (PieceID pieceID : pieceIDs) {
                 try {
-                    cachedPieces.get(i).add((T) new Piece(pieceID, i));
+                    cachedPieces.get(i).add((new Piece(pieceID, i)));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -28,10 +29,12 @@ public class MyPieceManager<T extends BasePiece<T>> implements PieceManager<T>, 
 
             piecesNotOnBoard.get(i).addAll(pieceIDs);
         }
+
+        this.amountOfPlayers = amountOfPlayers;
     }
 
     @Override
-    public List<T> getCachedPieces(int color) {
+    public List<Piece> getCachedPieces(int color) {
         return cachedPieces.get(color);
     }
 
@@ -46,7 +49,7 @@ public class MyPieceManager<T extends BasePiece<T>> implements PieceManager<T>, 
     }
 
     @Override
-    public T getCachedPiece(PieceID pieceID, int color) {
+    public Piece getCachedPiece(PieceID pieceID, int color) {
         return cachedPieces.get(color).get(pieceID.ordinal());
     }
 
@@ -68,5 +71,10 @@ public class MyPieceManager<T extends BasePiece<T>> implements PieceManager<T>, 
     @Override
     public boolean isColorOnBoard(int color) {
         return !piecesOnBoard.get(color).isEmpty();
+    }
+
+    @Override
+    public int getAmountOfPlayers() {
+        return amountOfPlayers;
     }
 }

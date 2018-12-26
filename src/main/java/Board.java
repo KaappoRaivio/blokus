@@ -1,10 +1,9 @@
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Supplier;
 
 
-public class Board<T extends BasePiece<T>> implements java.io.Serializable {
+public class Board implements java.io.Serializable {
 
     private static final int NO_PIECE = -1;
     private static final int EDGE = -1;
@@ -18,12 +17,12 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
     private int amountOfPlayers;
 
 
-    private PieceManager<T> pieceManager;
+    private PieceManager pieceManager;
 
-    Board (int dimX, int dimY, int amountOfPlayers, PieceManager<T> pieceManager) {
+    Board (int dimX, int dimY, PieceManager pieceManager) {
         this.dimX = dimX;
         this.dimY = dimY;
-        this.amountOfPlayers = amountOfPlayers;
+        this.amountOfPlayers = pieceManager.getAmountOfPlayers();
 
         this.pieceManager = pieceManager;
 
@@ -44,13 +43,8 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
         }
     }
 
-    private boolean isPieceOnBoard (BasePiece piece) {
-        return piece.isOnBoard();
-    }
-
-
     public boolean putOnBoard(int baseX, int baseY, PieceID pieceID, int color, Orientation orientation, boolean flip) {
-        T piece = pieceManager.getCachedPiece(pieceID, color).rotate(orientation, flip);
+        Piece piece = pieceManager.getCachedPiece(pieceID, color).rotate(orientation, flip);
 
         if (pieceManager.isOnBoard(pieceID, color)) {
             throw new RuntimeException("Piece " + piece + "already on board");
@@ -79,10 +73,10 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
         }
     }
 
-    private boolean fits (int baseX, int baseY, T piece) {
+    private boolean fits (int baseX, int baseY, Piece piece) {
         char[][] mesh = piece.getMesh();
 
-        if (isPieceOnBoard(piece)) {
+        if (piece.isOnBoard()) {
             return false;
         }
 
@@ -154,7 +148,7 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
 
     }
 
-    private void addToPiecesOnBoard (T piece) {
+    private void addToPiecesOnBoard (Piece piece) {
         pieceManager.placeOnBoard(piece.getID(), piece.getColor());
     }
 
@@ -162,7 +156,7 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
         return pieceManager.isColorOnBoard(color);
     }
 
-    private void dummyPut (int baseX, int baseY, T piece) {
+    private void dummyPut (int baseX, int baseY, Piece piece) {
         char[][] mesh = piece.getMesh();
 
         for (int y = 0; y < mesh.length; y++) {
@@ -183,7 +177,7 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
         }
     }
 
-    private void errorPut (int baseX, int baseY, T piece) {
+    private void errorPut (int baseX, int baseY, Piece piece) {
         char[][] mesh = piece.getMesh();
 
         for (int y = 0; y < mesh.length; y++) {
@@ -384,8 +378,8 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
         for (int y = 0; y < dimY; y++) {
             for (int x = 0; x < dimX; x++) {
                 for (PieceID pieceID : pieces) {
-                    T notRotated = pieceManager.getCachedPiece(pieceID, color);
-                    for (T piece : notRotated.getAllOrientations()) {
+                    Piece notRotated = pieceManager.getCachedPiece(pieceID, color);
+                    for (Piece piece : notRotated.getAllOrientations()) {
                         if (fits(x, y, piece)) {
                             moves.add(new Move(x, y, piece.getID(), piece.getColor(), piece.getOrientation(), piece.isFlipped()));
                         }
@@ -397,8 +391,8 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
         return moves;
     }
 
-    public Board<T> deepCopy () {
-        Board<T> newBoard;
+    public Board deepCopy () {
+        Board newBoard;
 
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -408,7 +402,7 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
 
             InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            newBoard = (Board<T>) objectInputStream.readObject();
+            newBoard = (Board) objectInputStream.readObject();
 
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -432,11 +426,11 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
     public class WorkerThread extends Thread {
 
         private final int color;
-        private Board<T> board;
+        private Board board;
         private Span span;
         private List<Move> moves = new ArrayList<>();
 
-        public WorkerThread (Board<T> board, Span span, int color) {
+        public WorkerThread (Board board, Span span, int color) {
             super();
 
             this.board = board;
@@ -450,8 +444,8 @@ public class Board<T extends BasePiece<T>> implements java.io.Serializable {
 
             for (Position position : span) {
                 for (PieceID pieceID : pieces) {
-                    T notRotated = pieceManager.getCachedPiece(pieceID, color);
-                    for (T piece : notRotated.getAllOrientations()) {
+                    Piece notRotated = pieceManager.getCachedPiece(pieceID, color);
+                    for (Piece piece : notRotated.getAllOrientations()) {
                         if (board.fits(position.x, position.y, piece)) {
                             moves.add(new Move(position.x, position.y, piece.getID(), piece.getColor(), piece.getOrientation(), piece.isFlipped()));
                         }
